@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Mozzi
-   &#160;<span id="projectnumber">alpha 0.01.1t</span>
+   &#160;<span id="projectnumber">alpha 0.01.1v</span>
    </div>
    <div id="projectbrief">sound synthesis library for Arduino</div>
   </td>
@@ -98,7 +98,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 Functions</h2></td></tr>
 <tr class="memitem:gafacb8849f96270644ea79184fde7db37"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__midi.html#gafacb8849f96270644ea79184fde7db37">mtof</a> (float midival)</td></tr>
 <tr class="memdesc:gafacb8849f96270644ea79184fde7db37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts midi note number to frequency.  <a href="#gafacb8849f96270644ea79184fde7db37"></a><br/></td></tr>
-<tr class="memitem:ga45bd3f3abd7ae5fa509eac3d3931a5b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__fixed_math.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__midi.html#ga45bd3f3abd7ae5fa509eac3d3931a5b2">Q16n16_mtof</a> (<a class="el" href="group__fixed_math.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a> midival_fractional)</td></tr>
+<tr class="memitem:ga45bd3f3abd7ae5fa509eac3d3931a5b2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="group__mozzi__fixmath.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__midi.html#ga45bd3f3abd7ae5fa509eac3d3931a5b2">Q16n16_mtof</a> (<a class="el" href="group__mozzi__fixmath.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a> midival_fractional)</td></tr>
 <tr class="memdesc:ga45bd3f3abd7ae5fa509eac3d3931a5b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts midi note number to frequency with speed and accuracy.  <a href="#ga45bd3f3abd7ae5fa509eac3d3931a5b2"></a><br/></td></tr>
 <tr class="memitem:ga1acfdfdb13a82ffd95281a78ceea9c66"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="group__midi.html#ga1acfdfdb13a82ffd95281a78ceea9c66">mtof</a> (unsigned char midi_note)</td></tr>
 <tr class="memdesc:ga1acfdfdb13a82ffd95281a78ceea9c66"><td class="mdescLeft">&#160;</td><td class="mdescRight">A good choice if you're using whole note values, want speed and simplicity, and accuracy isn't important.  <a href="#ga1acfdfdb13a82ffd95281a78ceea9c66"></a><br/></td></tr>
@@ -123,16 +123,18 @@ Functions</h2></td></tr>
 
 <p>Converts midi note number to frequency. </p>
 <p>Caution: this can take up to 400 microseconds to run. It can seriously mess up the audio output if you use it in <a class="el" href="group__core.html#ga59d187b915b2e366c88489e52801951a" title="This is where you put your control code.">updateControl()</a> or <a class="el" href="group__core.html#gaab0d2c840c1aac4bb5f9b8ef5df30f6a" title="This is where you put your audio code.">updateAudio()</a>. This is a good choice in setup(), or where you need precise midi-pitch conversion and aren't doing much other audio calculation. </p>
-<dl class="section note"><dt>Note:</dt><dd>Timing: ~350 us </dd></dl>
+<dl class="section note"><dt>Note:</dt><dd>Beware this returns an invalid result for midi note 0. </dd>
+<dd>
+Timing: ~350 us </dd></dl>
 <dl class="params"><dt><b>Parameters:</b></dt><dd>
   <table class="params">
-    <tr><td class="paramname">midival</td><td>a midi note number. Like the mtof object in Pd, midi values can have fractions. </td></tr>
+    <tr><td class="paramname">midival</td><td>a midi note number, 1.0 or greater. Like the mtof object in Pd, midi values can have fractions. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns:</dt><dd>the frequency represented by the input midi note number.. </dd></dl>
 
-<p>Definition at line <a class="el" href="mozzi__midi_8cpp_source.html#l00014">14</a> of file <a class="el" href="mozzi__midi_8cpp_source.html">mozzi_midi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mozzi__midi_8cpp_source.html#l00017">17</a> of file <a class="el" href="mozzi__midi_8cpp_source.html">mozzi_midi.cpp</a>.</p>
 
 </div>
 </div>
@@ -160,7 +162,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns:</dt><dd>an integer approximation of the midi note's frequency. </dd></dl>
 
-<p>Definition at line <a class="el" href="mozzi__midi_8cpp_source.html#l00145">145</a> of file <a class="el" href="mozzi__midi_8cpp_source.html">mozzi_midi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mozzi__midi_8cpp_source.html#l00155">155</a> of file <a class="el" href="mozzi__midi_8cpp_source.html">mozzi_midi.cpp</a>.</p>
 
 </div>
 </div>
@@ -188,7 +190,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns:</dt><dd>an integer approximation of the midi note's frequency. </dd></dl>
 
-<p>Definition at line <a class="el" href="mozzi__midi_8cpp_source.html#l00155">155</a> of file <a class="el" href="mozzi__midi_8cpp_source.html">mozzi_midi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mozzi__midi_8cpp_source.html#l00165">165</a> of file <a class="el" href="mozzi__midi_8cpp_source.html">mozzi_midi.cpp</a>.</p>
 
 </div>
 </div>
@@ -197,9 +199,9 @@ Functions</h2></td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="group__fixed_math.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a> <a class="el" href="group__midi.html#ga45bd3f3abd7ae5fa509eac3d3931a5b2">Q16n16_mtof</a> </td>
+          <td class="memname"><a class="el" href="group__mozzi__fixmath.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a> <a class="el" href="group__midi.html#ga45bd3f3abd7ae5fa509eac3d3931a5b2">Q16n16_mtof</a> </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="group__fixed_math.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="group__mozzi__fixmath.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a>&#160;</td>
           <td class="paramname"><em>midival_fractional</em></td><td>)</td>
           <td></td>
         </tr>
@@ -218,7 +220,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns:</dt><dd>the frequency represented by the input midi note number, in Q16n16 fixed point fractional integer format, where the lower word is a fractional value. </dd></dl>
 
-<p>Definition at line <a class="el" href="mozzi__midi_8cpp_source.html#l00121">121</a> of file <a class="el" href="mozzi__midi_8cpp_source.html">mozzi_midi.cpp</a>.</p>
+<p>Definition at line <a class="el" href="mozzi__midi_8cpp_source.html#l00131">131</a> of file <a class="el" href="mozzi__midi_8cpp_source.html">mozzi_midi.cpp</a>.</p>
 
 </div>
 </div>
@@ -226,7 +228,7 @@ Functions</h2></td></tr>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Feb 21 2013 00:07:27 for Mozzi by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Mar 21 2013 15:40:21 for Mozzi by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>
