@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Mozzi
-   &#160;<span id="projectnumber">alpha 0.01.1v</span>
+   &#160;<span id="projectnumber">alpha 0.01.1w</span>
    </div>
    <div id="projectbrief">sound synthesis library for Arduino</div>
   </td>
@@ -139,12 +139,18 @@ class WaveShaper&lt; int &gt;</h3>
 <p>Use the template parameter to set type of numbers being mapped. For example, <a class="el" href="class_wave_shaper.html" title="WaveShaper maps values from its input to values in a table, which are returned as output...">WaveShaper</a> &lt;int&gt; myWaveShaper; makes a <a class="el" href="class_wave_shaper.html" title="WaveShaper maps values from its input to values in a table, which are returned as output...">WaveShaper</a> which uses ints. </p>
 <dl class=""><dt><b>Template Parameters:</b></dt><dd>
   <table class="">
+    <tr><td class="paramname">T</td><td>the type of numbers being input to be shaped, chosen to match the table. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
     <tr><td class="paramname">TABLE_NAME</td><td>the name of the table being used, which can be found in the ".h" file containing the table. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_wave_shaper_8h_source.html#l00084">84</a> of file <a class="el" href="_wave_shaper_8h_source.html">WaveShaper.h</a>.</p>
+<p>Definition at line <a class="el" href="_wave_shaper_8h_source.html#l00085">85</a> of file <a class="el" href="_wave_shaper_8h_source.html">WaveShaper.h</a>.</p>
 
 </div>
 </div>
@@ -165,15 +171,15 @@ class WaveShaper&lt; int &gt;</h3>
 <div class="memdoc">
 
 <p>Maps input to output, transforming it according to the table being used. </p>
-<dl class=""><dt><b>Template Parameters:</b></dt><dd>
-  <table class="">
-    <tr><td class="paramname">in</td><td>the input signal. For flexibility, it's up to you to give the correct offset to your input signal. So if you'r mapping a signed 9-bit signal (such as the sum of 2 8-bit Oscils) into a 512 cell table centred around cell 256, add 256 to offset the input value. With a sigmoid table, this may be useful for compressing a bigger signal into the -244 to 243 output range of Mozzi, rather than dividing the signal and returning a char from <a class="el" href="group__core.html#gaab0d2c840c1aac4bb5f9b8ef5df30f6a" title="This is where you put your audio code.">updateAudio()</a>. </td></tr>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in</td><td>the input signal. For flexibility, it's up to you to give the correct offset to your input signal. So if you're mapping a signed 9-bit signal (such as the sum of 2 8-bit Oscils) into a 512 cell table centred around cell 256, add 256 to offset the input value. With a sigmoid table, this may be useful for compressing a bigger signal into the -244 to 243 output range of Mozzi, rather than dividing the signal and returning a char from <a class="el" href="group__core.html#gaab0d2c840c1aac4bb5f9b8ef5df30f6a" title="This is where you put your audio code.">updateAudio()</a>. </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns:</dt><dd>the shaped signal. </dd></dl>
 
-<p>Definition at line <a class="el" href="_wave_shaper_8h_source.html#l00101">101</a> of file <a class="el" href="_wave_shaper_8h_source.html">WaveShaper.h</a>.</p>
+<p>Definition at line <a class="el" href="_wave_shaper_8h_source.html#l00102">102</a> of file <a class="el" href="_wave_shaper_8h_source.html">WaveShaper.h</a>.</p>
 
 </div>
 </div>
@@ -184,7 +190,7 @@ class WaveShaper&lt; int &gt;</h3>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 27 2013 00:59:11 for Mozzi by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 1 2013 23:33:33 for Mozzi by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

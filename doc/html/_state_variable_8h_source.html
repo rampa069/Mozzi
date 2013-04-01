@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Mozzi
-   &#160;<span id="projectnumber">alpha 0.01.1v</span>
+   &#160;<span id="projectnumber">alpha 0.01.1w</span>
    </div>
    <div id="projectbrief">sound synthesis library for Arduino</div>
   </td>
@@ -184,7 +184,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00122"></a>00122                                 <span class="comment">// chooses a different next() function depending on whether the</span>
 <a name="l00123"></a>00123                                 <span class="comment">// filter is declared as LOWPASS, BANDPASS, HIGHPASS or NOTCH.</span>
 <a name="l00124"></a>00124                                 <span class="comment">// See meta.h.</span>
-<a name="l00125"></a>00125                                 <span class="keywordflow">return</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(input, <a class="code" href="struct_int2_type.html" title="Enables you to instantiate a template based on an integer value.">Int2Type&lt;FILTER_TYPE&gt;</a>());
+<a name="l00125"></a>00125                                 <span class="keywordflow">return</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(input, Int2Type&lt;FILTER_TYPE&gt;());
 <a name="l00126"></a>00126                 }
 <a name="l00127"></a>00127 
 <a name="l00128"></a>00128 
@@ -197,7 +197,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00135"></a>00135 
 <a name="l00136"></a>00136 
 <a name="l00142"></a>00142                 <span class="keyword">inline</span>
-<a name="l00143"></a>00143                 <span class="keywordtype">int</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(<span class="keywordtype">int</span> input, <a class="code" href="struct_int2_type.html" title="Enables you to instantiate a template based on an integer value.">Int2Type&lt;LOWPASS&gt;</a>)
+<a name="l00143"></a>00143                 <span class="keywordtype">int</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(<span class="keywordtype">int</span> input, Int2Type&lt;LOWPASS&gt;)
 <a name="l00144"></a>00144                 {
 <a name="l00145"></a>00145                                 <span class="comment">//SET_PIN13_HIGH;</span>
 <a name="l00146"></a>00146                                 low += (((long)band * f)&gt;&gt;15);
@@ -210,7 +210,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00153"></a>00153 
 <a name="l00154"></a>00154 
 <a name="l00160"></a>00160                 <span class="keyword">inline</span>
-<a name="l00161"></a>00161                 <span class="keywordtype">int</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(<span class="keywordtype">int</span> input, <a class="code" href="struct_int2_type.html" title="Enables you to instantiate a template based on an integer value.">Int2Type&lt;BANDPASS&gt;</a>)
+<a name="l00161"></a>00161                 <span class="keywordtype">int</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(<span class="keywordtype">int</span> input, Int2Type&lt;BANDPASS&gt;)
 <a name="l00162"></a>00162                 {
 <a name="l00163"></a>00163                                 <span class="comment">//SET_PIN13_HIGH;</span>
 <a name="l00164"></a>00164                                 low += (((long)band * f)&gt;&gt;15);
@@ -224,7 +224,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00172"></a>00172 
 <a name="l00173"></a>00173 
 <a name="l00179"></a>00179                 <span class="keyword">inline</span>
-<a name="l00180"></a>00180                 <span class="keywordtype">int</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(<span class="keywordtype">int</span> input, <a class="code" href="struct_int2_type.html" title="Enables you to instantiate a template based on an integer value.">Int2Type&lt;HIGHPASS&gt;</a>)
+<a name="l00180"></a>00180                 <span class="keywordtype">int</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(<span class="keywordtype">int</span> input, Int2Type&lt;HIGHPASS&gt;)
 <a name="l00181"></a>00181                 {
 <a name="l00182"></a>00182                                 <span class="comment">//SET_PIN13_HIGH;</span>
 <a name="l00183"></a>00183                                 low += (((long)band * f)&gt;&gt;15);
@@ -238,7 +238,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a name="l00191"></a>00191 
 <a name="l00192"></a>00192 
 <a name="l00198"></a>00198                 <span class="keyword">inline</span>
-<a name="l00199"></a>00199                 <span class="keywordtype">int</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(<span class="keywordtype">int</span> input, <a class="code" href="struct_int2_type.html" title="Enables you to instantiate a template based on an integer value.">Int2Type&lt;NOTCH&gt;</a>)
+<a name="l00199"></a>00199                 <span class="keywordtype">int</span> <a class="code" href="class_state_variable.html#a14cb100c22e4a33025665ef3620ca2b8" title="Calculate the next sample, given an input signal.">next</a>(<span class="keywordtype">int</span> input, Int2Type&lt;NOTCH&gt;)
 <a name="l00200"></a>00200                 {
 <a name="l00201"></a>00201                                 <span class="comment">//SET_PIN13_HIGH;</span>
 <a name="l00202"></a>00202                                 low += (((long)band * f)&gt;&gt;15);
@@ -256,7 +256,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 27 2013 00:59:10 for Mozzi by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 1 2013 23:33:33 for Mozzi by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>

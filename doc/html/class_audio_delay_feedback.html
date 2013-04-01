@@ -30,7 +30,7 @@
   
   <td style="padding-left: 0.5em;">
    <div id="projectname">Mozzi
-   &#160;<span id="projectnumber">alpha 0.01.1v</span>
+   &#160;<span id="projectnumber">alpha 0.01.1w</span>
    </div>
    <div id="projectbrief">sound synthesis library for Arduino</div>
   </td>
@@ -118,6 +118,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a8402a7a13a08a2876d057abd06f52ea5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input a value to the delay and retrieve the signal in the delay line at the position delaytime_cells.  <a href="#a8402a7a13a08a2876d057abd06f52ea5"></a><br/></td></tr>
 <tr class="memitem:a7aa5a3ce6644db1347533555d40192e0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_audio_delay_feedback.html#a7aa5a3ce6644db1347533555d40192e0">next</a> (char in_value, unsigned int delaytime_cells)</td></tr>
 <tr class="memdesc:a7aa5a3ce6644db1347533555d40192e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input a value to the delay and retrieve the signal in the delay line at the position delaytime_cells, updating all positions and feedback from the output to the input.  <a href="#a7aa5a3ce6644db1347533555d40192e0"></a><br/></td></tr>
+<tr class="memitem:a21db5f4440532982bb532bef341ed450"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_audio_delay_feedback.html#a21db5f4440532982bb532bef341ed450">next</a> (char in_value, <a class="el" href="group__mozzi__fixmath.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a> delaytime_cells)</td></tr>
+<tr class="memdesc:a21db5f4440532982bb532bef341ed450"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input a value to the delay and retrieve the signal in the delay line at the fractional position delaytime_cells, updating all positions and feedback from the output to the input.  <a href="#a21db5f4440532982bb532bef341ed450"></a><br/></td></tr>
 <tr class="memitem:a9dde51552427eae6df699c43b3a43e44"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_audio_delay_feedback.html#a9dde51552427eae6df699c43b3a43e44">write</a> (char in_value)</td></tr>
 <tr class="memdesc:a9dde51552427eae6df699c43b3a43e44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Input a value to the delay but don't change the read position or retrieve the output signal.  <a href="#a9dde51552427eae6df699c43b3a43e44"></a><br/></td></tr>
 <tr class="memitem:a8c9b3bfb75aba7a5c27500f5657c149c"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_audio_delay_feedback.html#a8c9b3bfb75aba7a5c27500f5657c149c">read</a> (unsigned int delaytime_cells)</td></tr>
@@ -136,13 +138,12 @@ class AudioDelayFeedback&lt; NUM_BUFFER_SAMPLES &gt;</h3>
 <p>Audio delay line with feedback for comb filter, flange, chorus and short echo effects. </p>
 <dl class=""><dt><b>Template Parameters:</b></dt><dd>
   <table class="">
-    <tr><td class="paramname">NUM_BUFFER_SAMPLES</td><td>is the length of the delay buffer in samples, and should be a power of two. The maximum delay length which will fit in an atmega328 is half that of a plain <a class="el" href="class_audio_delay.html" title="Audio delay line for comb filter, flange, chorus and short echo effects.">AudioDelay</a> object, in this case 256 cells, or about 15 milliseconds. <a class="el" href="class_audio_delay_feedback.html" title="Audio delay line with feedback for comb filter, flange, chorus and short echo effects.">AudioDelayFeedback</a> uses int sized cells to accomodate the higher amplitude of direct input to the delay as well as the feedback, without losing precision. Output is only the delay line signal. If you want to mix the delay with the input, do it in your sketch. <a class="el" href="class_audio_delay_feedback.html" title="Audio delay line with feedback for comb filter, flange, chorus and short echo effects.">AudioDelayFeedback</a> uses more processing than a plain <a class="el" href="class_audio_delay.html" title="Audio delay line for comb filter, flange, chorus and short echo effects.">AudioDelay</a>, but allows for more dramatic effects with feedback. </td></tr>
+    <tr><td class="paramname">NUM_BUFFER_SAMPLES</td><td>is the length of the delay buffer in samples, and should be a power of two. The maximum delay length which will fit in an atmega328 is half that of a plain <a class="el" href="class_audio_delay.html" title="Audio delay line for comb filter, flange, chorus and short echo effects.">AudioDelay</a> object, in this case 256 cells, or about 15 milliseconds. <a class="el" href="class_audio_delay_feedback.html" title="Audio delay line with feedback for comb filter, flange, chorus and short echo effects.">AudioDelayFeedback</a> uses int sized cells to accomodate the higher amplitude of direct input to the delay as well as the feedback, without losing precision. Output is only the delay line signal. If you want to mix the delay with the input, do it in your sketch. <a class="el" href="class_audio_delay_feedback.html" title="Audio delay line with feedback for comb filter, flange, chorus and short echo effects.">AudioDelayFeedback</a> uses more processing than a plain <a class="el" href="class_audio_delay.html" title="Audio delay line for comb filter, flange, chorus and short echo effects.">AudioDelay</a>, but allows for more dramatic effects with feedback. For smoother transitions between delay times, use AudioDelFbLInterp, which is like <a class="el" href="class_audio_delay_feedback.html" title="Audio delay line with feedback for comb filter, flange, chorus and short echo effects.">AudioDelayFeedback</a> with the addition of linear interpolation between delay times. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000003">Todo:</a></b></dt><dd>sub-sample delay times, just using linear interpolation of adacent cells </dd></dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00020">20</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00021">21</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 </div><hr/><h2>Constructor &amp; Destructor Documentation</h2>
 <a class="anchor" id="a67f12f1de6fece38cc7017bbb9dad3fa"></a>
 <div class="memitem">
@@ -169,7 +170,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00041">41</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00042">42</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -209,7 +210,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00051">51</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00052">52</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -239,7 +240,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00060">60</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00061">61</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -280,7 +281,47 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00084">84</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00085">85</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+
+</div>
+</div>
+<a class="anchor" id="a21db5f4440532982bb532bef341ed450"></a>
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="class_audio_delay_feedback.html">AudioDelayFeedback</a>&lt; NUM_BUFFER_SAMPLES &gt;::<a class="el" href="class_audio_delay_feedback.html#a8402a7a13a08a2876d057abd06f52ea5">next</a> </td>
+          <td>(</td>
+          <td class="paramtype">char&#160;</td>
+          <td class="paramname"><em>in_value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="group__mozzi__fixmath.html#ga20ef71528ee7583bbf60586448b12caf">Q16n16</a>&#160;</td>
+          <td class="paramname"><em>delaytime_cells</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td><code> [inline]</code></td>
+        </tr>
+      </table>
+</div>
+<div class="memdoc">
+
+<p>Input a value to the delay and retrieve the signal in the delay line at the fractional position delaytime_cells, updating all positions and feedback from the output to the input. </p>
+<dl class="params"><dt><b>Parameters:</b></dt><dd>
+  <table class="params">
+    <tr><td class="paramname">in_value</td><td>the signal input. </td></tr>
+    <tr><td class="paramname">delaytime_cells</td><td>is a fractional number to set the delay time in terms of cells or partial cells in the delay buffer. It doesn't change the stored internal value of _delaytime_cells. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00113">113</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -310,7 +351,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00116">116</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00154">154</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -333,7 +374,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
 <p>Retrieve the signal in the delay line at the current delaytime_cells. </p>
 <p>It doesn't change the stored internal value of _delaytime_cells or feedback the output to the input. </p>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00130">130</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00168">168</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -362,7 +403,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00146">146</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00184">184</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -391,7 +432,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00156">156</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00194">194</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -420,7 +461,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
   </dd>
 </dl>
 
-<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00105">105</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
+<p>Definition at line <a class="el" href="_audio_delay_feedback_8h_source.html#l00143">143</a> of file <a class="el" href="_audio_delay_feedback_8h_source.html">AudioDelayFeedback.h</a>.</p>
 
 </div>
 </div>
@@ -431,7 +472,7 @@ template&lt;unsigned int NUM_BUFFER_SAMPLES&gt; </div>
 
 
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Mar 27 2013 00:59:11 for Mozzi by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Apr 1 2013 23:33:33 for Mozzi by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.0
 </small></address>
