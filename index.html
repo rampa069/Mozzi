@@ -27,7 +27,8 @@
     <div style="position:absolute; left:0px; top:50px">
       <img alt="logo" src="index_files/mozzi_smooth_courier_rotated_small_flying.png" style="left:0px; top:0px;position:relative; padding:0;border: none;box-shadow:none;margin:0;" align="left" border="0">
     </div> 
-
+ 
+     
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
 
@@ -49,7 +50,21 @@
     </div> 
 
     <!-- MAIN CONTENT -->
+
     <div id="main_content_wrap" class="outer">
+    
+    <div style="position:relative;  margin-left:20px; margin-right:20px; left:0px; top:0px; max-width:20%;float:left;font-size:80%;background: #e9e9e9;padding:1%;padding-top:3%">
+    <h5>News</h5>
+       <p>
+        <strong>Mozzi workshop, 8-9 June in Sydney, as part of <a href="http://www.isea2013.org/event-category/workshops/">ISEA2013</a>.</strong>
+        </p>
+        <img alt="Mozzi workshop banner" src="images/mozzi_poster_tiny.png" style="left:0px; top:0px;position:relative; max-width:95%;padding-bottom:30px;border: none;box-shadow:none;margin:0;" align="center" border="0" > 
+        <p>
+        Through guided making, participants will learn to use Mozzi and Arduino to combine sensors with synthesis to make complex, reactive sounds. By the end of the workshop everyone will have created their own responsive sound-generating objects.
+        More details and registration: <a href="http://www.isea2013.org/event-category/workshops/">ISEA2013</a>
+        </p>
+    </div>
+     
       <section id="main_content" class="inner">
       <p>
         Currently your Arduino can only beep like a microwave oven. Mozzi brings your Arduino to life by allowing it to produce much more complex and interesting growls, sweeps and chorusing atmospherics. These sounds can be quickly and easily constructed from familiar synthesis units like oscillators, delays, filters and envelopes.  
@@ -194,8 +209,9 @@
       } 
       
       int updateAudio() {
-      	// your audio code which returns an int between -244 and 243 
-      	// actually, a char is fine 
+      	// your audio code which returns an int 
+      	// between -244 and 243 in STANDARD mode
+      	// or between -8192 and 8191 in HIFI mode
       } 
       
       void updateControl() {
@@ -236,10 +252,11 @@
       <h4>
         Included Dependencies  
       </h4>
-      TimerOne library - <a href="http://www.pjrc.com/teensy/td_libs_TimerOne.html">http://www.pjrc.com/teensy/td_libs_TimerOne.html</a>
+      Slightly modified versions of the following libraries are included in the Mozzi download: <br>
+      <a href="http://www.pjrc.com/teensy/td_libs_TimerOne.html">TimerOne</a><br>
+      <a href="http://www.arduino.cc/playground/Code/FrequencyTimer2">FrequencyTImer2</a><br>
       <br>
-      <p>
-      </p>
+      
 
       <p>
       </p>

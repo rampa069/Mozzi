@@ -169,9 +169,6 @@ pre, code {
   border-radius: 2px;
   -moz-border-radius: 2px;
   -webkit-border-radius: 2px;
-
-
-
 }
 
 pre {
@@ -266,7 +263,6 @@ img {
 Full-Width Styles
 *******************************************************************************/
 
-
 .outer {
   width: 100%;
 }
@@ -274,6 +270,13 @@ Full-Width Styles
 .inner {
   position: relative;
   max-width: 640px;
+  padding: 20px 10px;
+  margin: 0 auto;
+}
+
+.inner_left {
+  position: relative;
+  max-width: 320px;
   padding: 20px 10px;
   margin: 0 auto;
 }
@@ -292,6 +295,14 @@ Full-Width Styles
   box-shadow: 0 0 10px rgba(0,0,0,.5);
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
+}
+
+#workshop_image {
+  display: block;
+  float: right;
+ max-width:300px;
+  overflow: hidden;
+  background: url(images/mozzi_poster_tiny.png) no-repeat bottom left;
 }
 
 #version_number {
@@ -411,6 +422,10 @@ Full-Width Styles
   background: #212121;
 }
 
+#left_content {
+  padding-top: 40px;
+  max-width: 200px;
+}
 
 
 /*******************************************************************************
