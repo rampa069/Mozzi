@@ -61,6 +61,8 @@ static volatile unsigned long output_buffer_tail; // shared by audioHook() (in l
 static byte pre_mozzi_TCCR0A, pre_mozzi_TCCR0B, pre_mozzi_OCR0A, pre_mozzi_TIMSK0;
 static byte pre_mozzi_TCCR1A, pre_mozzi_TCCR1B, pre_mozzi_OCR1A, pre_mozzi_TIMSK1;
 
+
+
 #if (AUDIO_MODE == HIFI)
 #if defined(TCCR2A)
 static byte pre_mozzi_TCCR2A, pre_mozzi_TCCR2B, pre_mozzi_OCR2A, pre_mozzi_TIMSK2;
@@ -71,12 +73,58 @@ static byte pre_mozzi_TCCR4A, pre_mozzi_TCCR4B, pre_mozzi_TCCR4C, pre_mozzi_TCCR
 #endif
 #endif
 
-static void backupPreMozziTimer1(){
-	// backup pre-mozzi register values for pausing later
-	pre_mozzi_TCCR1A = TCCR1A;
-	pre_mozzi_TCCR1B = TCCR1B;
-	pre_mozzi_OCR1A = OCR1A;
-	pre_mozzi_TIMSK1 = TIMSK1;
+
+#if (DAC_MODE == MIDIVOX)
+
+void startDac()
+{
+    cli();
+    SPCR = 0x50;   // set up SPI port  SPCR = 01010000,
+    SPSR = 0x01;  //
+    DDRB |= 0x2E;       // PB output for DAC CS, and SPI port
+    PORTB |= (1<<1);   // CS high
+    sei();
+
+}
+
+
+
+void dacOutput(unsigned int sample) {
+
+    uint8_t dacSPI0;		// the two bytes that go to the DAC over SPI
+    uint8_t dacSPI1;
+
+    //DAC TEST
+    //sample = 2033;
+
+    //sample=map(sample,0,254,0,4095);
+
+
+
+    dacSPI0 = sample >> 8;
+    dacSPI0 >>= 4;
+    //dacSPI0 |= 0x30; // Write to DAC-A, unbuffered VREF, gain=1x, Output Power Down Control bit (low impedence out?),
+    dacSPI0 |= 0x30;  //buffered VRef
+    dacSPI1 = sample >> 4;
+
+    // transmit value out the SPI port
+    PORTB &= ~(1<<1); // Frame sync low
+    SPDR = dacSPI0;  //The SPI Data Register - Writing to the register initiates data transmission.
+    while (!(SPSR & (1<<SPIF))); //Wait for data to be sent over SPI, flag raised
+    SPDR = dacSPI1;
+    while (!(SPSR & (1<<SPIF)));
+    PORTB |= (1<<1); // Frame sync high
+
+}
+#endif
+
+
+static void backupPreMozziTimer1() {
+    // backup pre-mozzi register values for pausing later
+    pre_mozzi_TCCR1A = TCCR1A;
+    pre_mozzi_TCCR1B = TCCR1B;
+    pre_mozzi_OCR1A = OCR1A;
+    pre_mozzi_TIMSK1 = TIMSK1;
 }
 
 //-----------------------------------------------------------------------------------------------------------------
@@ -95,24 +143,26 @@ static byte mozzi_TCCR4A, mozzi_TCCR4B, mozzi_TCCR4C, mozzi_TCCR4D, mozzi_TCCR4E
 #endif
 #endif
 
-static void backupMozziTimer1(){
-	// backup mozzi register values for unpausing later
-	mozzi_TCCR1A = TCCR1A;
-	mozzi_TCCR1B = TCCR1B;
-	mozzi_OCR1A = OCR1A;
-	mozzi_TIMSK1 = TIMSK1;
+static void backupMozziTimer1() {
+    // backup mozzi register values for unpausing later
+    mozzi_TCCR1A = TCCR1A;
+    mozzi_TCCR1B = TCCR1B;
+    mozzi_OCR1A = OCR1A;
+    mozzi_TIMSK1 = TIMSK1;
 }
 
 //-----------------------------------------------------------------------------------------------------------------
+
+
 
 #if USE_AUDIO_INPUT
 
 #include "mozzi_analog.h"
 
-static void adcSetupAudioInput(){
-	adcEnableInterrupt();
-	setupFastAnalogRead();
-	adcSetChannel(0);
+static void adcSetupAudioInput() {
+    adcEnableInterrupt();
+    setupFastAnalogRead();
+    adcSetChannel(0);
 }
 
 static volatile long input_gap;
@@ -124,7 +174,7 @@ static int audio_input; // holds the latest audio from input_buffer
 
 int getAudioInput()
 {
-	return audio_input;
+    return audio_input;
 }
 
 
@@ -132,14 +182,14 @@ int getAudioInput()
 */
 ISR(ADC_vect, ISR_BLOCK)
 {
-	// gets here about 16us after being set audio output isr
-	input_buffer_head++;
-	input_buffer[input_buffer_head & (BUFFER_NUM_CELLS-1)] = ADC; // put new data into input_buffer, don't worry about overwriting old, as guarding would also cause a glitch
-	if (input_gap > (BUFFER_NUM_CELLS/2)) {
-		do_update_audio = true;
-	}else{
-		do_update_audio = false;
-	}
+    // gets here about 16us after being set audio output isr
+    input_buffer_head++;
+    input_buffer[input_buffer_head & (BUFFER_NUM_CELLS-1)] = ADC; // put new data into input_buffer, don't worry about overwriting old, as guarding would also cause a glitch
+    if (input_gap > (BUFFER_NUM_CELLS/2)) {
+        do_update_audio = true;
+    } else {
+        do_update_audio = false;
+    }
 }
 
 #endif
@@ -148,284 +198,349 @@ ISR(ADC_vect, ISR_BLOCK)
 
 void audioHook() // 2us excluding updateAudio()
 {
-	static unsigned long output_buffer_head = 0;
-	long output_gap = output_buffer_head - output_buffer_tail; // wraps to a big number if it's negative, and will take a long time to wrap
+    static unsigned long output_buffer_head = 0;
+    long output_gap = output_buffer_head - output_buffer_tail; // wraps to a big number if it's negative, and will take a long time to wrap
 
 #if USE_AUDIO_INPUT // 3us
 
-	static unsigned long input_buffer_tail =0;
-	input_gap = input_buffer_head - input_buffer_tail; // wraps to a big number if it's negative, and will take a long time to wrap
-	if ((output_gap < BUFFER_NUM_CELLS) && do_update_audio) {
-		input_buffer_tail++;
-		audio_input = input_buffer[input_buffer_tail & (BUFFER_NUM_CELLS-1)];
+    static unsigned long input_buffer_tail =0;
+    input_gap = input_buffer_head - input_buffer_tail; // wraps to a big number if it's negative, and will take a long time to wrap
+    if ((output_gap < BUFFER_NUM_CELLS) && do_update_audio) {
+        input_buffer_tail++;
+        audio_input = input_buffer[input_buffer_tail & (BUFFER_NUM_CELLS-1)];
 
 #else
 
-		if(output_gap < BUFFER_NUM_CELLS) // prevent writing over cells which haven't been output yet
-		{
+    if(output_gap < BUFFER_NUM_CELLS) // prevent writing over cells which haven't been output yet
+    {
 
 #endif
-			output_buffer_head++;
-			output_buffer[(unsigned char)output_buffer_head & (unsigned char)(BUFFER_NUM_CELLS-1)] = (unsigned int) (updateAudio() + AUDIO_BIAS);
-		}
+        output_buffer_head++;
+        output_buffer[(unsigned char)output_buffer_head & (unsigned char)(BUFFER_NUM_CELLS-1)] = (unsigned int) (updateAudio() + AUDIO_BIAS);
+    }
 
-	}
+}
 
 
-	//-----------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------------------
 #if (AUDIO_MODE == STANDARD)
 
-	static void startAudioStandard(){
-		backupPreMozziTimer1();
+static void startAudioStandard() {
+    backupPreMozziTimer1();
+    startDac();
 
-		pinMode(AUDIO_CHANNEL_1_PIN, OUTPUT);	// set pin to output for audio
-		Timer1.initialize(1000000UL/AUDIO_RATE, PHASE_FREQ_CORRECT);		// set period, phase and frequency correct
-		Timer1.pwm(AUDIO_CHANNEL_1_PIN, AUDIO_BIAS);		// pwm pin, 50% of Mozzi's duty cycle, ie. 0 signal
-		TIMSK1 = _BV(TOIE1); 	// Overflow Interrupt Enable (when not using Timer1.attachInterrupt())
+    pinMode(AUDIO_CHANNEL_1_PIN, OUTPUT);	// set pin to output for audio
+    Timer1.initialize(1000000UL/AUDIO_RATE, PHASE_FREQ_CORRECT);		// set period, phase and frequency correct
+    Timer1.pwm(AUDIO_CHANNEL_1_PIN, AUDIO_BIAS);		// pwm pin, 50% of Mozzi's duty cycle, ie. 0 signal
+    TIMSK1 = _BV(TOIE1); 	// Overflow Interrupt Enable (when not using Timer1.attachInterrupt())
 
-		backupMozziTimer1();
+    backupMozziTimer1();
 
 #if USE_AUDIO_INPUT
-		adcSetupAudioInput();
+    adcSetupAudioInput();
 #endif
-	}
+}
 
 
-	/* Interrupt service routine moves sound data from the output buffer to the
-	Arduino output register, running at AUDIO_RATE. */
-	ISR(TIMER1_OVF_vect, ISR_BLOCK) {
+/* Interrupt service routine moves sound data from the output buffer to the
+Arduino output register, running at AUDIO_RATE. */
+ISR(TIMER1_OVF_vect,ISR_BLOCK) {
 #if USE_AUDIO_INPUT
-		sbi(ADCSRA, ADSC);				// start next adc conversion
+    sbi(ADCSRA, ADSC);				// start next adc conversion
 #endif
-		output_buffer_tail++;
-		AUDIO_CHANNEL_1_OUTPUT_REGISTER = output_buffer[(unsigned char)output_buffer_tail & (unsigned char)(BUFFER_NUM_CELLS-1)]; // 1us, 2.5us with longs
-	}
+    output_buffer_tail++;
+    //AUDIO_CHANNEL_1_OUTPUT_REGISTER = output_buffer[(unsigned char)output_buffer_tail & (unsigned char)(BUFFER_NUM_CELLS-1)]; // 1us, 2.5us with longs
 
-	// end STANDARD
+    uint16_t sample=output_buffer[(unsigned char)output_buffer_tail & (unsigned char)(BUFFER_NUM_CELLS-1)];
 
-	//-----------------------------------------------------------------------------------------------------------------
+#if (DAC_MODE == MIDIVOX)
+
+    uint8_t dacSPI0;		// the two bytes that go to the DAC over SPI
+    uint8_t dacSPI1;
+
+
+    sample=map(sample,0,254,0,4095);
+
+
+
+    dacSPI0 = sample >> 8;
+    dacSPI0 >>= 4;
+    //dacSPI0 |= 0x30; // Write to DAC-A, unbuffered VREF, gain=1x, Output Power Down Control bit (low impedence out?),
+    dacSPI0 |= 0x30;  //buffered VRef
+    dacSPI1 = sample >> 4;
+
+    // transmit value out the SPI port
+    PORTB &= ~(1<<1); // Frame sync low
+    SPDR = dacSPI0;  //The SPI Data Register - Writing to the register initiates data transmission.
+    while (!(SPSR & (1<<SPIF))); //Wait for data to be sent over SPI, flag raised
+    SPDR = dacSPI1;
+    while (!(SPSR & (1<<SPIF)));
+    PORTB |= (1<<1); // Frame sync high
+#endif
+
+}
+
+// end STANDARD
+
+//-----------------------------------------------------------------------------------------------------------------
 #elif (AUDIO_MODE == HIFI)
 
-	static void startAudioHiFi(){
-		backupPreMozziTimer1();
+static void startAudioHiFi() {
+    backupPreMozziTimer1();
 
-		// pwm on timer 1
-		pinMode(AUDIO_CHANNEL_1_HIGHBYTE_PIN, OUTPUT);	// set pin to output for audio, use 3.9k resistor
-		pinMode(AUDIO_CHANNEL_1_LOWBYTE_PIN, OUTPUT);	// set pin to output for audio, use 1M resistor
+    // pwm on timer 1
+    //pinMode(AUDIO_CHANNEL_1_HIGHBYTE_PIN, OUTPUT);	// set pin to output for audio, use 3.9k resistor
+    //pinMode(AUDIO_CHANNEL_1_LOWBYTE_PIN, OUTPUT);	// set pin to output for audio, use 1M resistor
 
-		Timer1.initialize(1000000UL/125000, FAST);		// set period for 125000 Hz fast pwm carrier frequency = 14 bits
+    Timer1.initialize(1000000UL/125000, FAST);		// set period for 125000 Hz fast pwm carrier frequency = 14 bits
 
-		Timer1.pwm(AUDIO_CHANNEL_1_HIGHBYTE_PIN, 0);		// pwm pin, 0% duty cycle, ie. 0 signal
-		Timer1.pwm(AUDIO_CHANNEL_1_LOWBYTE_PIN, 0);		// pwm pin, 0% duty cycle, ie. 0 signal
+    Timer1.pwm(AUDIO_CHANNEL_1_HIGHBYTE_PIN, 0);		// pwm pin, 0% duty cycle, ie. 0 signal
+    Timer1.pwm(AUDIO_CHANNEL_1_LOWBYTE_PIN, 0);		// pwm pin, 0% duty cycle, ie. 0 signal
 
-		backupMozziTimer1();
+    backupMozziTimer1();
 
-		// audio output interrupt on timer 2, sets the pwm levels of timer 1
-		setupTimer2();
+    // audio output interrupt on timer 2, sets the pwm levels of timer 1
+    setupTimer2();
 
 #if USE_AUDIO_INPUT
-		adcSetupAudioInput();
+    adcSetupAudioInput();
 #endif
-	}
+}
 
-	/* set up Timer 2 using modified FrequencyTimer2 library */
-	void dummy(){}
+/* set up Timer 2 using modified FrequencyTimer2 library */
+void dummy() {}
 
-	static void setupTimer2(){
-		//backup Timer2 register values
+static void setupTimer2() {
+    //backup Timer2 register values
 #if defined(TCCR2A)
-		pre_mozzi_TCCR2A = TCCR2A;
-		pre_mozzi_TCCR2B = TCCR2B;
-		pre_mozzi_OCR2A = OCR2A;
-		pre_mozzi_TIMSK2 = TIMSK2;
+    pre_mozzi_TCCR2A = TCCR2A;
+    pre_mozzi_TCCR2B = TCCR2B;
+    pre_mozzi_OCR2A = OCR2A;
+    pre_mozzi_TIMSK2 = TIMSK2;
 #elif defined(TCCR2)
-		pre_mozzi_TCCR2 = TCCR2;
-		pre_mozzi_OCR2 = OCR2;
-		pre_mozzi_TIMSK = TIMSK;
+    pre_mozzi_TCCR2 = TCCR2;
+    pre_mozzi_OCR2 = OCR2;
+    pre_mozzi_TIMSK = TIMSK;
 #elif defined(TCCR4A)
-		pre_mozzi_TCCR4B = TCCR4A;
-		pre_mozzi_TCCR4B = TCCR4B;
-		pre_mozzi_TCCR4B = TCCR4C;
-		pre_mozzi_TCCR4B = TCCR4D;
-		pre_mozzi_TCCR4B = TCCR4E;
-		pre_mozzi_OCR4C = OCR4C;
-		pre_mozzi_TIMSK4 = TIMSK4;
+    pre_mozzi_TCCR4B = TCCR4A;
+    pre_mozzi_TCCR4B = TCCR4B;
+    pre_mozzi_TCCR4B = TCCR4C;
+    pre_mozzi_TCCR4B = TCCR4D;
+    pre_mozzi_TCCR4B = TCCR4E;
+    pre_mozzi_OCR4C = OCR4C;
+    pre_mozzi_TIMSK4 = TIMSK4;
 #endif
 
-		// audio output interrupt on timer 2 (or 4 on ATMEGA32U4 cpu), sets the pwm levels of timer 1
+    // audio output interrupt on timer 2 (or 4 on ATMEGA32U4 cpu), sets the pwm levels of timer 1
 
-		FrequencyTimer2::setPeriod(2000000UL/AUDIO_RATE); // gives a period half of what's provided, for some reason
-		FrequencyTimer2::setOnOverflow(dummy);
-		FrequencyTimer2::enable();
+    FrequencyTimer2::setPeriod(2000000UL/AUDIO_RATE); // gives a period half of what's provided, for some reason
+    FrequencyTimer2::setOnOverflow(dummy);
+    FrequencyTimer2::enable();
 
-		// backup mozzi register values for unpausing later
+    // backup mozzi register values for unpausing later
 #if defined(TCCR2A)
-		mozzi_TCCR2A = TCCR2A;
-		mozzi_TCCR2B = TCCR2B;
-		mozzi_OCR2A = OCR2A;
-		mozzi_TIMSK2 = TIMSK2;
+    mozzi_TCCR2A = TCCR2A;
+    mozzi_TCCR2B = TCCR2B;
+    mozzi_OCR2A = OCR2A;
+    mozzi_TIMSK2 = TIMSK2;
 #elif defined(TCCR2)
-		mozzi_TCCR2 = TCCR2;
-		mozzi_OCR2 = OCR2;
-		mozzi_TIMSK = TIMSK;
+    mozzi_TCCR2 = TCCR2;
+    mozzi_OCR2 = OCR2;
+    mozzi_TIMSK = TIMSK;
 #elif defined(TCCR4A)
-		mozzi_TCCR4B = TCCR4A;
-		mozzi_TCCR4B = TCCR4B;
-		mozzi_TCCR4B = TCCR4C;
-		mozzi_TCCR4B = TCCR4D;
-		mozzi_TCCR4B = TCCR4E;
-		mozzi_OCR4C = OCR4C;
-		mozzi_TIMSK4 = TIMSK4;
+    mozzi_TCCR4B = TCCR4A;
+    mozzi_TCCR4B = TCCR4B;
+    mozzi_TCCR4B = TCCR4C;
+    mozzi_TCCR4B = TCCR4D;
+    mozzi_TCCR4B = TCCR4E;
+    mozzi_OCR4C = OCR4C;
+    mozzi_TIMSK4 = TIMSK4;
 #endif
-	}
+}
 
-	#if defined(TIMER2_COMPA_vect)
-	ISR(TIMER2_COMPA_vect)
+#if defined(TIMER2_COMPA_vect)
+ISR(TIMER2_COMPA_vect)
 #elif defined(TIMER2_COMP_vect)
-	ISR(TIMER2_COMP_vect)
+ISR(TIMER2_COMP_vect)
 #elif defined(TIMER4_COMPA_vect)
-	ISR(TIMER4_COMPA_vect)
+ISR(TIMER4_COMPA_vect)
 #else
 #error "This board does not have a hardware timer which is compatible with FrequencyTimer2"
-	void dummy_function(void)
+void dummy_function(void)
 #endif
-	{
+{
 #if USE_AUDIO_INPUT
-		sbi(ADCSRA, ADSC);				// start next adc conversion
+    sbi(ADCSRA, ADSC);				// start next adc conversion
 #endif
 
-		output_buffer_tail++;
-		unsigned int out = output_buffer[(unsigned char)output_buffer_tail & (unsigned char)(BUFFER_NUM_CELLS-1)]; // 1us, 2.5us with longs
+    output_buffer_tail++;
+    unsigned int out = output_buffer[(unsigned char)output_buffer_tail & (unsigned char)(BUFFER_NUM_CELLS-1)]; // 1us, 2.5us with longs
 
-		// read about dual pwm at http://www.openmusiclabs.com/learning/digital/pwm-dac/dual-pwm-circuits/
-		// sketches at http://wiki.openmusiclabs.com/wiki/PWMDAC,  http://wiki.openmusiclabs.com/wiki/MiniArDSP
+#if (DAC_MODE == MIDIVOX)
+    uint8_t dacSPI0;		// the two bytes that go to the DAC over SPI
+    uint8_t dacSPI1;
+#endif
+    // read about dual pwm at http://www.openmusiclabs.com/learning/digital/pwm-dac/dual-pwm-circuits/
+    // sketches at http://wiki.openmusiclabs.com/wiki/PWMDAC,  http://wiki.openmusiclabs.com/wiki/MiniArDSP
 
-		// 14 bit - this sounds better than 12 bit, it's cleaner, less bitty, don't notice aliasing
-		AUDIO_CHANNEL_1_HIGHBYTE_REGISTER = out >> 7; // B11111110000000 becomes B1111111
-		AUDIO_CHANNEL_1_LOWBYTE_REGISTER = out & 127; // B001111111
+    // 14 bit - this sounds better than 12 bit, it's cleaner, less bitty, don't notice aliasing
+    AUDIO_CHANNEL_1_HIGHBYTE_REGISTER = out >> 7; // B11111110000000 becomes B1111111
+    AUDIO_CHANNEL_1_LOWBYTE_REGISTER = out & 127; // B001111111
 
-	}
+#if (DAC_MODE == MIDIVOX)
+    dacSPI1 = lowByte(out); // B11111110000000 becomes B1111111
+    dacSPI0 = highByte(out) ; // B001111111
 
-	//  end of HIFI
+    //DAC TEST
+    //sample = 2033;
+
+
+
+    //dacSPI0 = out >> 8;
+    dacSPI0 >>= 4;
+    //dacSPI0 |= 0x30; // Write to DAC-A, unbuffered VREF, gain=1x, Output Power Down Control bit (low impedence out?),
+    dacSPI0 |= 0x70;  //buffered VRef
+    //dacSPI1 = out >> 4;
+
+    // transmit value out the SPI port
+    PORTB &= ~(1<<1); // Frame sync low
+    SPDR = dacSPI0;  //The SPI Data Register - Writing to the register initiates data transmission.
+    while (!(SPSR & (1<<SPIF))); //Wait for data to be sent over SPI, flag raised
+    SPDR = dacSPI1;
+    while (!(SPSR & (1<<SPIF)));
+    PORTB |= (1<<1); // Frame sync high
+#endif
+
+}
+
+//  end of HIFI
 
 #endif
 
 
-	//-----------------------------------------------------------------------------------------------------------------
 
-	/* Sets up Timer 0 for control interrupts. This is the same for all output
-	options Using Timer0 for control disables Arduino's time functions but also
-	saves on the interrupts and blocking action of those functions. May add a config
-	option for Using Timer2 instead if needed. (MozziTimer2 can be re-introduced for
-	that). */
-	static void startControl(unsigned int control_rate_hz)
-	{
-		// backup pre-mozzi register values
-		pre_mozzi_TCCR0A = TCCR0A;
-		pre_mozzi_TCCR0B = TCCR0B;
-		pre_mozzi_OCR0A = OCR0A;
-		pre_mozzi_TIMSK0 = TIMSK0;
+//-----------------------------------------------------------------------------------------------------------------
 
-		TimerZero::init(1000000/control_rate_hz,updateControl); // set period, attach updateControl()
-		TimerZero::start();
+/* Sets up Timer 0 for control interrupts. This is the same for all output
+options Using Timer0 for control disables Arduino's time functions but also
+saves on the interrupts and blocking action of those functions. May add a config
+option for Using Timer2 instead if needed. (MozziTimer2 can be re-introduced for
+that). */
+static void startControl(unsigned int control_rate_hz)
+{
+    // backup pre-mozzi register values
+    pre_mozzi_TCCR0A = TCCR0A;
+    pre_mozzi_TCCR0B = TCCR0B;
+    pre_mozzi_OCR0A = OCR0A;
+    pre_mozzi_TIMSK0 = TIMSK0;
 
-		// backup mozzi register values for unpausing later
-		mozzi_TCCR0A = TCCR0A;
-		mozzi_TCCR0B = TCCR0B;
-		mozzi_OCR0A = OCR0A;
-		mozzi_TIMSK0 = TIMSK0;
-	}
+    TimerZero::init(1000000/control_rate_hz,updateControl); // set period, attach updateControl()
+    TimerZero::start();
+
+    // backup mozzi register values for unpausing later
+    mozzi_TCCR0A = TCCR0A;
+    mozzi_TCCR0B = TCCR0B;
+    mozzi_OCR0A = OCR0A;
+    mozzi_TIMSK0 = TIMSK0;
+}
 
 
-	void startMozzi(int control_rate_hz)
-	{
-		startControl(control_rate_hz);
+
+void startMozzi(int control_rate_hz)
+{
+    startControl(control_rate_hz);
 #if (AUDIO_MODE == STANDARD)
-		startAudioStandard();
+    startAudioStandard();
 #elif (AUDIO_MODE == HIFI)
-		startAudioHiFi();
+    startAudioHiFi();
 #endif
-	}
+
+#if (DAC_MODE == MIDIVOX)
+    startDac();
+}
+#endif
 
 
-	void pauseMozzi(){
-		// restore backed up register values
-		TCCR0A = pre_mozzi_TCCR0A;
-		TCCR0B = pre_mozzi_TCCR0B;
-		OCR0A = pre_mozzi_OCR0A;
-		TIMSK0 = pre_mozzi_TIMSK0;
+void pauseMozzi() {
+    // restore backed up register values
+    TCCR0A = pre_mozzi_TCCR0A;
+    TCCR0B = pre_mozzi_TCCR0B;
+    OCR0A = pre_mozzi_OCR0A;
+    TIMSK0 = pre_mozzi_TIMSK0;
 
-		TCCR1A = pre_mozzi_TCCR1A;
-		TCCR1B = pre_mozzi_TCCR1B;
-		OCR1A = pre_mozzi_OCR1A;
-		TIMSK1 = pre_mozzi_TIMSK1;
+    TCCR1A = pre_mozzi_TCCR1A;
+    TCCR1B = pre_mozzi_TCCR1B;
+    OCR1A = pre_mozzi_OCR1A;
+    TIMSK1 = pre_mozzi_TIMSK1;
 
 #if (AUDIO_MODE == HIFI)
 #if defined(TCCR2A)
-		TCCR2A = pre_mozzi_TCCR2A;
-		TCCR2B = pre_mozzi_TCCR2B;
-		OCR2A = pre_mozzi_OCR2A;
-		TIMSK2 = pre_mozzi_TIMSK2;
+    TCCR2A = pre_mozzi_TCCR2A;
+    TCCR2B = pre_mozzi_TCCR2B;
+    OCR2A = pre_mozzi_OCR2A;
+    TIMSK2 = pre_mozzi_TIMSK2;
 #elif defined(TCCR2)
-		TCCR2 = pre_mozzi_TCCR2;
-		OCR2 = pre_mozzi_OCR2;
-		TIMSK = pre_mozzi_TIMSK;
+    TCCR2 = pre_mozzi_TCCR2;
+    OCR2 = pre_mozzi_OCR2;
+    TIMSK = pre_mozzi_TIMSK;
 #elif defined(TCCR4A)
-		TCCR4B = pre_mozzi_TCCR4A;
-		TCCR4B = pre_mozzi_TCCR4B;
-		TCCR4B = pre_mozzi_TCCR4C;
-		TCCR4B = pre_mozzi_TCCR4D;
-		TCCR4B = pre_mozzi_TCCR4E;
-		OCR4C = pre_mozzi_OCR4C;
-		TIMSK4 = pre_mozzi_TIMSK4;
+    TCCR4B = pre_mozzi_TCCR4A;
+    TCCR4B = pre_mozzi_TCCR4B;
+    TCCR4B = pre_mozzi_TCCR4C;
+    TCCR4B = pre_mozzi_TCCR4D;
+    TCCR4B = pre_mozzi_TCCR4E;
+    OCR4C = pre_mozzi_OCR4C;
+    TIMSK4 = pre_mozzi_TIMSK4;
 #endif
-#endif			
-	}
+#endif
+}
 
 
-	void unPauseMozzi(){
-		// restore backed up register values
-		TCCR0A = mozzi_TCCR0A;
-		TCCR0B = mozzi_TCCR0B;
-		OCR0A = mozzi_OCR0A;
-		TIMSK0 = mozzi_TIMSK0;
+void unPauseMozzi() {
+    // restore backed up register values
+    TCCR0A = mozzi_TCCR0A;
+    TCCR0B = mozzi_TCCR0B;
+    OCR0A = mozzi_OCR0A;
+    TIMSK0 = mozzi_TIMSK0;
 
-		TCCR1A = mozzi_TCCR1A;
-		TCCR1B = mozzi_TCCR1B;
-		OCR1A = mozzi_OCR1A;
-		TIMSK1 = mozzi_TIMSK1;
+    TCCR1A = mozzi_TCCR1A;
+    TCCR1B = mozzi_TCCR1B;
+    OCR1A = mozzi_OCR1A;
+    TIMSK1 = mozzi_TIMSK1;
 
 #if (AUDIO_MODE == HIFI)
 #if defined(TCCR2A)
-		TCCR2A = mozzi_TCCR2A;
-		TCCR2B = mozzi_TCCR2B;
-		OCR2A = mozzi_OCR2A;
-		TIMSK2 = mozzi_TIMSK2;
+    TCCR2A = mozzi_TCCR2A;
+    TCCR2B = mozzi_TCCR2B;
+    OCR2A = mozzi_OCR2A;
+    TIMSK2 = mozzi_TIMSK2;
 #elif defined(TCCR2)
-		TCCR2 = mozzi_TCCR2;
-		OCR2 = mozzi_OCR2;
-		TIMSK = mozzi_TIMSK;
+    TCCR2 = mozzi_TCCR2;
+    OCR2 = mozzi_OCR2;
+    TIMSK = mozzi_TIMSK;
 #elif defined(TCCR4A)
-		TCCR4B = mozzi_TCCR4A;
-		TCCR4B = mozzi_TCCR4B;
-		TCCR4B = mozzi_TCCR4C;
-		TCCR4B = mozzi_TCCR4D;
-		TCCR4B = mozzi_TCCR4E;
-		OCR4C = mozzi_OCR4C;
-		TIMSK4 = mozzi_TIMSK4;
+    TCCR4B = mozzi_TCCR4A;
+    TCCR4B = mozzi_TCCR4B;
+    TCCR4B = mozzi_TCCR4C;
+    TCCR4B = mozzi_TCCR4D;
+    TCCR4B = mozzi_TCCR4E;
+    OCR4C = mozzi_OCR4C;
+    TIMSK4 = mozzi_TIMSK4;
 #endif
-#endif			
-	}
-	
+#endif
+}
 
-	unsigned long mozziMicros(){
-		return output_buffer_tail / MICROS_PER_AUDIO_TICK;
-	}
 
-	// Unmodified TimerOne.cpp has TIMER3_OVF_vect.
-	// Watch out if you update the library file.
-	// The symptom will be no sound.
-	// ISR(TIMER1_OVF_vect)
-	// {
-	// 	Timer1.isrCallback();
-	// }
+unsigned long mozziMicros() {
+    return output_buffer_tail / MICROS_PER_AUDIO_TICK;
+}
+
+// Unmodified TimerOne.cpp has TIMER3_OVF_vect.
+// Watch out if you update the library file.
+// The symptom will be no sound.
+// ISR(TIMER1_OVF_vect)
+// {
+// 	Timer1.isrCallback();
+// }
+
+

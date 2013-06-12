@@ -300,4 +300,9 @@ unsigned long mozziMicros();
 // internal use
 static void setupTimer2();
 
+#if DAC_MODE == MIDIVOX
+void startDac();
+void dacOutput(unsigned int sample);
+#endif
+
 #endif /* MOZZIGUTS_H_ */

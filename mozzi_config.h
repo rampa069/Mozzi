@@ -11,9 +11,10 @@ or
 In Mozzi/config.h, comment one of these options in and the other out to set the audio mode.
 */
 
-#define AUDIO_MODE STANDARD
-//#define AUDIO_MODE HIFI
+//#define AUDIO_MODE STANDARD
+#define AUDIO_MODE HIFI
 
+#define DAC_MODE MIDIVOX
 
 /** @ingroup core
 AUDIO_RATE can be \#defined as 16384 or 32768 Hertz in Mozzi/mozzi_config.h. 
