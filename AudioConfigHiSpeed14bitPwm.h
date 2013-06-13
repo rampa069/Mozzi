@@ -24,6 +24,5 @@ Boards, pins and resistor positions are documented in MozziGuts.h
 // 14 bit
 #define AUDIO_BIAS ((unsigned int) 0x2000)
 
-
 #endif        //  #ifndef AUDIOCONFIGHISPEED14BITPWM_H
 

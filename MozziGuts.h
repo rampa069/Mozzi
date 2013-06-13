@@ -164,6 +164,8 @@ x...........B5(25)...B6(26)...........Teensy2++  \n
 
 #if AUDIO_MODE == STANDARD
 #include "AudioConfigStandard9bitPwm.h"
+#elif DAC_MODE == MIDIVOX
+#include "AudioConfigHiSpeed12bitPwm.h"
 #elif AUDIO_MODE == HIFI
 #include "AudioConfigHiSpeed14bitPwm.h"
 #endif

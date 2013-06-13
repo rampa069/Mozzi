@@ -397,9 +397,9 @@ void dummy_function(void)
 
 
     //dacSPI0 = out >> 8;
-    dacSPI0 >>= 4;
+    //dacSPI0 >>= 4;
     //dacSPI0 |= 0x30; // Write to DAC-A, unbuffered VREF, gain=1x, Output Power Down Control bit (low impedence out?),
-    dacSPI0 |= 0x70;  //buffered VRef
+    dacSPI0 |= 0x30;  //buffered VRef
     //dacSPI1 = out >> 4;
 
     // transmit value out the SPI port
